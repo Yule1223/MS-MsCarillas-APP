@@ -1,0 +1,109 @@
+package Test_JPA;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Date;
+import java.util.List;
+
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+
+import Clases.Negocio.FactoriaSA;
+import Clases.Negocio.Departamento.TDepartamento;
+import Clases.Negocio.Trabajador.TIndefinido;
+import Clases.Negocio.Trabajador.TTemporal;
+import Clases.Negocio.Trabajador.TTrabajador;
+
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+
+@TestMethodOrder(OrderAnnotation.class)
+public class Trabajador_Test_Negocio {
+
+	static int _id_TrabajadorTemporal; 
+	static int _id_TrabajadorIndefinido;
+	@Test
+	@Order(1) 
+	void test_crearTrabajador() {
+		/*
+		 * 
+		 * 1 - creamos 1 departamento
+		 * 2 - creamos 1 trabajador indefinido y otro temporal
+		 * 2.1 fallos: 
+		 * 		
+		 * 		- DNI mal
+		 * 		- correo mal
+		 * 		- Departamento mal
+		 * 		- Una vez insertamos un trabajador comprobamos que el otro --> DNI repetido
+		 * */
+		TDepartamento departamento = new TDepartamento("Departamento_PruebaTrabajador_Test",true,"pruebas_trbajador_dpto@ucm.es","Madrid",987654321L);
+		int id_Departamento = FactoriaSA.getInstance().generateSADepartamento().altaDepartamento(departamento);
+		
+		TTemporal trabajadorTemporal  = new TTemporal("98492521N","Trabajador_Temporal_Test",123456789L,"Calle JUNIT", new Date(2021,2,1),"temporal",true,id_Departamento,new Date(2021,5,31),(float) 8.25,35);
+		int id_TrabajadorTemporal = FactoriaSA.getInstance().generateSATrabajador().altaTrabajador(trabajadorTemporal);
+		//el correo mal
+		assertEquals(id_TrabajadorTemporal,-98);
+		
+		//correo actualizado
+		trabajadorTemporal.setCorreo("trabajador_test_Temp@ucm.es");
+		//departamento mal
+		trabajadorTemporal.setIdDepartamento(9999);
+		id_TrabajadorTemporal = FactoriaSA.getInstance().generateSATrabajador().altaTrabajador(trabajadorTemporal);
+		assertEquals(id_TrabajadorTemporal,-81);
+		
+		trabajadorTemporal.setIdDepartamento(id_Departamento);
+		
+		//dni mal
+		trabajadorTemporal.setDNI("98492521J");
+		id_TrabajadorTemporal = FactoriaSA.getInstance().generateSATrabajador().altaTrabajador(trabajadorTemporal);
+		assertEquals(id_TrabajadorTemporal,-97);
+		
+		
+		trabajadorTemporal.setDNI("98492521N");
+		
+		id_TrabajadorTemporal = FactoriaSA.getInstance().generateSATrabajador().altaTrabajador(trabajadorTemporal);
+		assertTrue(id_TrabajadorTemporal > 0);
+		TIndefinido trabajadorIndefinido  = new TIndefinido("98492521N","Trabajador_Indefinido_Test",123456789L,"Calle JUNIT", new Date(2021,2,1),"indefinido@test.com",true,id_Departamento,(float) 1850.75,(float)125.25);
+		
+		int id_TrabajadorIndefinido = FactoriaSA.getInstance().generateSATrabajador().altaTrabajador(trabajadorIndefinido);
+		
+		assertEquals(id_TrabajadorIndefinido,-90);
+		
+		trabajadorIndefinido.setDNI("76815995C");
+		id_TrabajadorIndefinido = FactoriaSA.getInstance().generateSATrabajador().altaTrabajador(trabajadorIndefinido);
+		assertTrue(id_TrabajadorIndefinido > 0);
+		
+		_id_TrabajadorIndefinido = id_TrabajadorIndefinido;
+		_id_TrabajadorTemporal = id_TrabajadorTemporal;
+	}
+	@Test
+	@Order(2)
+	public void test_bajaTrabajador() {
+		//no existe
+		int id_baja = FactoriaSA.getInstance().generateSATrabajador().bajaTrabajador(999);
+		assertEquals(id_baja,-91);
+		id_baja = FactoriaSA.getInstance().generateSATrabajador().bajaTrabajador(_id_TrabajadorIndefinido);
+		assertEquals(id_baja,_id_TrabajadorIndefinido);
+		
+		id_baja = FactoriaSA.getInstance().generateSATrabajador().bajaTrabajador(_id_TrabajadorIndefinido);
+		assertEquals(id_baja,-92);
+		
+	}
+	@Test
+	@Order(3)
+	public void test_MostrarTrabajador() {
+		TTrabajador indefinido = FactoriaSA.getInstance().generateSATrabajador().mostrarTrabajador(_id_TrabajadorIndefinido);
+		assertEquals(indefinido.isActivo(),false);
+		assertTrue(indefinido.getId() > 0 );
+	}
+	@Test
+	@Order(4)
+	public void test_MostrarTrabajadores() {
+		List<TTrabajador> trabajadores = FactoriaSA.getInstance().generateSATrabajador().listarTrabajadores();
+		
+		for(int i = 0; i < trabajadores.size();i++) {
+			assertTrue(trabajadores.get(i).getId()>0);
+		}
+	}
+}

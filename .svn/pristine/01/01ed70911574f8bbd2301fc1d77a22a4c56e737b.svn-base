@@ -1,0 +1,37 @@
+package Test_JPA;
+
+import java.util.Date;
+
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+
+import Clases.Negocio.Trabajador.TTemporal;
+import Clases.Negocio.Trabajador.TTrabajador;
+
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+
+@TestMethodOrder(OrderAnnotation.class)
+public class Trabajador_Test_Negocio {
+
+	
+	@Test
+	@Order(1) 
+	void test_crearTrabajador() {
+		/*
+		 * 
+		 * 1 - creamos 1 departamento
+		 * 2 - creamos 1 trabajador indefinido y otro temporal
+		 * 2.1 fallos: 
+		 * 		- Telefono mal
+		 * 		- DNI mal
+		 * 		- correo mal
+		 * 		- Departamento mal
+		 * 		- Una vez insertamos un trabajador comprobamos que el otro --> DNI repetido
+		 * */
+		/*(String dNI,  String nombre, Long teléfono, String direccion, Date fechainicio,
+			String correo, Boolean activo, Integer idDepartamento, Date fechaFin, Float sueldoPH,
+			Integer horasMensuales)*/
+		//TTemporal trabajador = new TTemporal("","Trabajador_Temporal_Test",123456789L,"Calle JUNIT", new Date())
+	}
+}

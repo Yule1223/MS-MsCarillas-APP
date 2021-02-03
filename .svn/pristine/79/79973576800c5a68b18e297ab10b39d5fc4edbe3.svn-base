@@ -1,0 +1,10 @@
+package Clases.Presentación.Empresa;
+
+public class gMostrarCursosEmpresa {
+
+	public void init() {
+		// TODO Auto-generated method stub
+		
+	}
+
+}

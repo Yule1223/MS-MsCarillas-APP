@@ -1,0 +1,80 @@
+package Test_JPA;
+
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.BeforeAll;
+
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+
+import Clases.Negocio.FactoriaSA;
+import Clases.Negocio.Curso.TCurso;
+import Clases.Negocio.Empresa.TEmpresa;
+import Test_JPA.PrepararLaEjecucion;
+
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+
+
+
+
+@TestMethodOrder(OrderAnnotation.class)
+public class Empresa_Test_Negocio {
+	@BeforeAll
+    static void setUp() {
+        
+    }
+	
+	@Test
+	@Order(1) 
+	void test_createEmpresa() {	
+		// supungo que partimos de bbdd vacia:
+		TEmpresa empresa1 = new TEmpresa("Mercantil", true, "46111028F", "Sause SA", "c/ rosario", (long) 922234451, "sausesacom");
+		int id_1=FactoriaSA.getInstance().generateSAEmpresa().altaEmpresa(empresa1);
+		assertTrue(id_1 == -71); // correo mal 
+		TEmpresa empresa2 = new TEmpresa("Mercantil", true, "11028F", "Sause SA", "c/ rosario", (long) 922234451, "sausesa@gmail.com");
+		int id_2=FactoriaSA.getInstance().generateSAEmpresa().altaEmpresa(empresa2);
+		assertTrue(id_2 == -72); // cif mal
+		TEmpresa empresa3 = new TEmpresa("Mercantil", true, "46111028F", "Sause SA", "c/ rosario", (long) 922, "sausesa@gmail.com");
+		int id_3=FactoriaSA.getInstance().generateSAEmpresa().altaEmpresa(empresa3);
+		assertTrue(id_3 == -73); // telf mal
+		TEmpresa empresa4 = new TEmpresa("Mercantil", true, "46111028F", "Sause SA", "c/ rosario", (long) 922234451, "sausesa@gmail.com");
+		int id_4=FactoriaSA.getInstance().generateSAEmpresa().altaEmpresa(empresa4);
+		assertTrue(id_4 == 1); // idcorrecta
+		int id_5=FactoriaSA.getInstance().generateSAEmpresa().altaEmpresa(empresa4);
+		assertTrue(id_5 == -75); // cif repetido y activo;
+		TEmpresa empresa4_desactivada = new TEmpresa("Mercantil", true, "46111028F", "Sause SA", "c/ rosario", (long) 922234451, "sausesa@gmail.com");
+		int id_desactivada=FactoriaSA.getInstance().generateSAEmpresa().actualizarEmpresa(empresa4_desactivada);
+		assertTrue(id_desactivada == 1); // Asumo que modificar está bien.
+		int id_reactivacion=FactoriaSA.getInstance().generateSAEmpresa().altaEmpresa(empresa4); // empresa 4 está activada
+		assertTrue(id_reactivacion==1);
+		
+	}
+	@Test
+	@Order(2) 
+	void test_deleteEmpresa() {	
+		//aquí va el metodo que me vacia la  tabla.
+		//supungo que partimos de bbdd vacia:
+		TEmpresa empresa1 = new TEmpresa("Mercantil", true, "46111028F", "Sause SA", "c/ rosario", (long) 922234451, "sausesa@gmail.com");
+		int id_1=FactoriaSA.getInstance().generateSAEmpresa().altaEmpresa(empresa1); // empresa activada
+		TEmpresa empresa2 = new TEmpresa("Textil", false, "98492521N", "Juancarlos SA", "c/ benito", (long) 922234451, "sausesa@gmail.com");
+		int id_2=FactoriaSA.getInstance().generateSAEmpresa().altaEmpresa(empresa2); // empresa desactivada
+		TEmpresa empresa3 = new TEmpresa("Alimentacion", true, "12490427R", "LAVIN PUENTE SA", "c/ complu", (long) 922234451, "sausesa@gmail.com");
+		int id_3=FactoriaSA.getInstance().generateSAEmpresa().altaEmpresa(empresa3); // empresa activada
+		//Asumo que curso funciona
+		TCurso curso = new TCurso("prevension accidentes", true, "riesgos laborales", "curso que forma a los empleados para que no se maten", 160, 2, 3);
+		int idcurso=FactoriaSA.getInstance().generateSACurso().altaCurso(curso); // La empresa 1 tiene un curso.
+		int id_bajanoexiste=FactoriaSA.getInstance().generateSAEmpresa().bajaEmpresa(9999);
+		assertTrue(id_bajanoexiste==-74);
+		int id_bajanormal=FactoriaSA.getInstance().generateSAEmpresa().bajaEmpresa(id_1);
+		assertTrue(id_bajanormal==1);
+		int id_baja=FactoriaSA.getInstance().generateSAEmpresa().bajaEmpresa(id_2);
+		assertTrue(id_baja==-76); // empresa already bajada
+		int id_bajaconcurso=FactoriaSA.getInstance().generateSAEmpresa().bajaEmpresa(id_3);
+		assertTrue(id_bajaconcurso==-77); // empresa already bajada
+		
+	}
+}
